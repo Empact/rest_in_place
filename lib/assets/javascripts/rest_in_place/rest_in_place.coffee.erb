@@ -94,6 +94,8 @@ class RestInPlaceEditor
   # query string parameters in the form `object[attribute]`, just as Rails
   # expects it.
   initOptions : (options) ->
+    options ||= {}
+
     @$element.parents().each (index, parent) =>
       @url           ||= $(parent).attr("data-url")
       @formType      ||= $(parent).attr("data-formtype")
