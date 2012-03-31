@@ -36,13 +36,13 @@ class RestInPlaceEditor
       type : "post"
       data : @requestData()
       beforeSend : (xhr, settings) =>
-        @fire('rest_in_place:update', [@$element, xhr, settings])
+        @fire('rest_in_place:update', [xhr, settings])
       done : (data) =>
-        @fire('rest_in_place:done', [@$element, data])
+        @fire('rest_in_place:done', [data])
         if data
           @loadSuccessCallback(data)
       fail : (jqXHR, textStatus) =>
-        @fire('rest_in_place:fail', [@$element, jqXHR, textStatus])
+        @fire('rest_in_place:fail', [jqXHR, textStatus])
         @abort()
 
   fire : (type, args) ->
