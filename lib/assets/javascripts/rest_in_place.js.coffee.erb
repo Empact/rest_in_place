@@ -36,7 +36,7 @@ class RestInPlaceEditor
       type : "post"
       data : @requestData()
       beforeSend : (xhr, settings) =>
-        @fire('rest_in_place:update', [xhr, settings])
+        @fire('rest_in_place:update', [@$element, xhr, settings])
 
     updateRequest.done (data) =>
       if data 
