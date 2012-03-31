@@ -3,9 +3,9 @@
 # This is the main class that manages the manipulation of the DOM and the AJAX
 # requests
 class RestInPlaceEditor
-  constructor : (e) ->
-    @$element = $(e)
-    @initOptions()
+  constructor : (element, options) ->
+    @$element = $(element)
+    @initOptions(options)
     @bindForm()
     @createClickHandler()
     
@@ -48,7 +48,7 @@ class RestInPlaceEditor
       else
         @abort()
         
-    @$element.html("saving...")
+    @$element.html(@saving_message)
   
   loadViaGET : ->
     showRequest = @ajax()
@@ -93,7 +93,7 @@ class RestInPlaceEditor
   # Name of the attribute on the object. Combined with the object name to build
   # query string parameters in the form `object[attribute]`, just as Rails
   # expects it.
-  initOptions : ->
+  initOptions : (options) ->
     @$element.parents().each (index, parent) =>
       @url           ||= $(parent).attr("data-url")
       @formType      ||= $(parent).attr("data-formtype")
@@ -107,6 +107,8 @@ class RestInPlaceEditor
     @formType      = @$element.attr("data-formtype")  || @formType || "input"
     @objectName    = @$element.attr("data-object")    || @objectName
     @attributeName = @$element.attr("data-attribute") || @attributeName
+
+    @saving_message = options.saving_message || "saving..."
     
   # Overwrites formtype specific method implementations during initialization
   bindForm : ->
@@ -203,7 +205,7 @@ window.RestInPlaceEditor = RestInPlaceEditor
 # for example:
 #
 #     jQuery(".rest-in-place").restInPlace();
-$.fn.restInPlace = ->
+$.fn.restInPlace = (options) ->
   @each ->
-    $(this).data('restInPlaceEditor', new RestInPlaceEditor(this))
+    $(this).data('restInPlaceEditor', new RestInPlaceEditor(this, options))
   return this
