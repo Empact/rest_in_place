@@ -38,24 +38,17 @@ class RestInPlaceEditor
       beforeSend : (xhr, settings) =>
         @fire('rest_in_place:update', [@$element, xhr, settings])
       done : (data) =>
+        @fire('rest_in_place:done', [@$element, data])
         if data
           @loadSuccessCallback(data)
-        else
-          @loadViaGET()
       fail : (jqXHR, textStatus) =>
-        if (jqXHR.status == 200 && textStatus == "parsererror")
-          @loadViaGET()
-        else
-          @abort()
+        @fire('rest_in_place:fail', [@$element, jqXHR, textStatus])
+        @abort()
 
   fire : (type, args) ->
     event = $.Event(type)
     @$element.trigger(event, args)
     !event.isDefaultPrevented()
-
-  loadViaGET : ->
-    showRequest = @ajax()
-    showRequest.done (data) => @loadSuccessCallback(data)
   
   # ## Implementation Methods
   #
