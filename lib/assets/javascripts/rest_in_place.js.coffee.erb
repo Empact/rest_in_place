@@ -32,25 +32,34 @@ class RestInPlaceEditor
       data : @requestData()
       beforeSend : (xhr, settings) =>
         @fire('rest_in_place:update', [xhr, settings])
-    ).done((data) =>
-      if data
-        @$element.html(@extractAttributeFromData(data))
-      @fire('rest_in_place:success', [data])
-    ).fail((jqXHR, textStatus, errorThrown) =>
-      @$element.html(@oldValue)
-      @fire('rest_in_place:error', [jqXHR, textStatus, errorThrown])
-    ).always((jqXHR, textStatus) =>
-      @$element
-        .removeClass('rip-active')
-        .click(@clickHandler)
-      @fire('rest_in_place:complete', [jqXHR, textStatus])
-    )
+    ).done(@success).fail(@error).always(@complete)
 
   fire : (type, args) ->
     event = $.Event(type)
     @$element.trigger(event, args)
     !event.isDefaultPrevented()
-  
+
+  success : (data) =>
+    if data
+      @$element.html(@extractAttributeFromData(data))
+    @fire('rest_in_place:success', [data])
+
+  error : (jqXHR, textStatus, errorThrown) =>
+    @$element.html(@oldValue)
+    @fire('rest_in_place:error', [jqXHR, textStatus, errorThrown])
+
+  complete : (jqXHR, textStatus) =>
+    @$element
+      .removeClass('rip-active')
+      .click(@clickHandler)
+    @fire('rest_in_place:complete', [jqXHR, textStatus])
+
+  abort : =>
+    @$element
+      .html(@oldValue)
+      .removeClass('rip-active')
+      .click(@clickHandler)
+
   # ## Implementation Methods
   #
   # These are not implemented in RestInPlaceEditor. Instead, different form
@@ -157,7 +166,8 @@ RestInPlaceEditor.forms =
       @$element.find("form").submit =>
         @update()
         false
-      @$element.find("input").blur => @abort()
+      @$element.find("input").blur(@abort)
+
     
     getValue : ->
       @$element.find("input").val()
