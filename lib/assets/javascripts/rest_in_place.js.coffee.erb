@@ -33,17 +33,17 @@ class RestInPlaceEditor
       beforeSend : (xhr, settings) =>
         @fire('rest_in_place:update', [xhr, settings])
     ).done((data) =>
-      @fire('rest_in_place:success', [data])
       if data
         @$element.html(@extractAttributeFromData(data))
+      @fire('rest_in_place:success', [data])
     ).fail((jqXHR, textStatus, errorThrown) =>
-      @fire('rest_in_place:error', [jqXHR, textStatus, errorThrown])
       @$element.html(@oldValue)
+      @fire('rest_in_place:error', [jqXHR, textStatus, errorThrown])
     ).always((jqXHR, textStatus) =>
-      @fire('rest_in_place:complete', [jqXHR, textStatus])
       @$element
         .removeClass('rip-active')
         .click(@clickHandler)
+      @fire('rest_in_place:complete', [jqXHR, textStatus])
     )
 
   fire : (type, args) ->
