@@ -47,8 +47,8 @@ class RestInPlaceEditor
         @loadViaGET()
       else
         @abort()
-        
-    @$element.html(@saving_message)
+
+    @updateCallback()
   
   loadViaGET : ->
     showRequest = @ajax()
@@ -108,7 +108,8 @@ class RestInPlaceEditor
     @objectName    = @$element.attr("data-object")    || @objectName
     @attributeName = @$element.attr("data-attribute") || @attributeName
 
-    @saving_message = options.saving_message || "saving..."
+    @updateCallback = options.update || -> @$element.html("saving...")
+
     
   # Overwrites formtype specific method implementations during initialization
   bindForm : ->
