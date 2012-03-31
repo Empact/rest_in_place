@@ -95,13 +95,13 @@ class RestInPlaceEditor
   # expects it.
   initOptions : ->
     @$element.parents().each (index, parent) =>
-      @url           = @url           || $(parent).attr("data-url")
-      @formType      = @formType      || $(parent).attr("data-formtype")
-      @objectName    = @objectName    || $(parent).attr("data-object")
-      @attributeName = @attributeName || $(parent).attr("data-attribute")
+      @url           ||= $(parent).attr("data-url")
+      @formType      ||= $(parent).attr("data-formtype")
+      @objectName    ||= $(parent).attr("data-object")
+      @attributeName ||= $(parent).attr("data-attribute")
 
     @$element.parents().each (index, parent) =>
-      @objectName = @objectName || res[1] if res = parent.id.match(/^(\w+)_(\d+)$/i)
+      @objectName ||= res[1] if res = parent.id.match(/^(\w+)_(\d+)$/i)
 
     @url           = @$element.attr("data-url")       || @url      || document.location.pathname
     @formType      = @$element.attr("data-formtype")  || @formType || "input"
