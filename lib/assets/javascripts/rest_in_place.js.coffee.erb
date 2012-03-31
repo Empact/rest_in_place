@@ -37,18 +37,16 @@ class RestInPlaceEditor
       data : @requestData()
       beforeSend : (xhr, settings) =>
         @fire('rest_in_place:update', [@$element, xhr, settings])
-
-    updateRequest.done (data) =>
-      if data 
-        @loadSuccessCallback(data)
-      else
-        @loadViaGET()
-        
-    updateRequest.fail (jqXHR, textStatus) =>
-      if (jqXHR.status == 200 && textStatus == "parsererror")
-        @loadViaGET()
-      else
-        @abort()
+      done : (data) =>
+        if data
+          @loadSuccessCallback(data)
+        else
+          @loadViaGET()
+      fail : (jqXHR, textStatus) =>
+        if (jqXHR.status == 200 && textStatus == "parsererror")
+          @loadViaGET()
+        else
+          @abort()
 
   fire : (type, args) ->
     event = $.Event(type)
