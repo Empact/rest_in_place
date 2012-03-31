@@ -207,7 +207,3 @@ $.fn.restInPlace = ->
   @each ->
     $(this).data('restInPlaceEditor', new RestInPlaceEditor(this))
   return this
-
-
-# Run automatically
-$ -> $('.rest-in-place').restInPlace()
