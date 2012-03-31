@@ -103,7 +103,8 @@ class RestInPlaceEditor
       @attributeName ||= $(parent).attr("data-attribute")
 
     @$element.parents().each (index, parent) =>
-      @objectName ||= res[1] if res = parent.id.match(/^(\w+)_(\d+)$/i)
+      if res = parent.id.match(/^(\w+)_(<%= RestInPlace.id_chars %>+)$/i)
+        @objectName ||= res[1]
 
     @url           = @$element.attr("data-url")       || @url      || document.location.pathname
     @formType      = @$element.attr("data-formtype")  || @formType || "input"
