@@ -3,9 +3,9 @@
 # This is the main class that manages the manipulation of the DOM and the AJAX
 # requests
 class RestInPlaceEditor
-  constructor : (element, options) ->
+  constructor : (element) ->
     @$element = $(element)
-    @initOptions(options)
+    @initOptions()
     @bindForm()
     @createClickHandler()
     
@@ -35,7 +35,10 @@ class RestInPlaceEditor
     updateRequest = @ajax
       type : "post"
       data : @requestData()
-      
+
+    updateRequest.beforeSend (xhr, settings) =>
+      @fire('rest_in_place:update', [xhr, settings])
+
     updateRequest.done (data) =>
       if data 
         @loadSuccessCallback(data)
@@ -48,8 +51,11 @@ class RestInPlaceEditor
       else
         @abort()
 
-    @updateCallback()
-  
+  fire : (type, args) ->
+    event = $.Event(type)
+    @$element.trigger(event, args)
+    !event.isDefaultPrevented()
+
   loadViaGET : ->
     showRequest = @ajax()
     showRequest.done (data) => @loadSuccessCallback(data)
@@ -93,9 +99,7 @@ class RestInPlaceEditor
   # Name of the attribute on the object. Combined with the object name to build
   # query string parameters in the form `object[attribute]`, just as Rails
   # expects it.
-  initOptions : (options) ->
-    options ||= {}
-
+  initOptions : ->
     @$element.parents().each (index, parent) =>
       @url           ||= $(parent).attr("data-url")
       @formType      ||= $(parent).attr("data-formtype")
@@ -110,9 +114,6 @@ class RestInPlaceEditor
     @formType      = @$element.attr("data-formtype")  || @formType || "input"
     @objectName    = @$element.attr("data-object")    || @objectName
     @attributeName = @$element.attr("data-attribute") || @attributeName
-
-    @updateCallback = options.update || -> @$element.html("saving...")
-
     
   # Overwrites formtype specific method implementations during initialization
   bindForm : ->
@@ -209,7 +210,7 @@ window.RestInPlaceEditor = RestInPlaceEditor
 # for example:
 #
 #     jQuery(".rest-in-place").restInPlace();
-$.fn.restInPlace = (options) ->
+$.fn.restInPlace = ->
   @each ->
-    $(this).data('restInPlaceEditor', new RestInPlaceEditor(this, options))
+    $(this).data('restInPlaceEditor', new RestInPlaceEditor(this))
   return this
