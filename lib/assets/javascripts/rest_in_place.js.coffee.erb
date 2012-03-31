@@ -20,30 +20,32 @@ class RestInPlaceEditor
     @$element.unbind('click', @clickHandler)
     @activateForm()
   
-  # Restore the element to its default state
-  abort : ->
-    @$element
-      .html(@oldValue)
-      .removeClass('rip-active')
-      .click(@clickHandler)
-  
   # Take the changes a user has made and send them to the server.
   # If the server accepted the request but does not send back a
   # parseable answer, a second request is initiated to retrieve the updated
   # value via GET
   update : ->
-    updateRequest = @ajax
+    $.ajax(
+      url: @url
+      dataType: 'json'
       type : "post"
       data : @requestData()
       beforeSend : (xhr, settings) =>
         @fire('rest_in_place:update', [xhr, settings])
-      done : (data) =>
-        @fire('rest_in_place:done', [data])
-        if data
-          @loadSuccessCallback(data)
-      fail : (jqXHR, textStatus) =>
-        @fire('rest_in_place:fail', [jqXHR, textStatus])
-        @abort()
+    ).done((data) =>
+      @fire('rest_in_place:done', [data])
+      if data
+        @$element
+          .html(@extractAttributeFromData(data))
+          .removeClass('rip-active')
+          .click(@clickHandler)
+    ).fail((jqXHR, textStatus) =>
+      @fire('rest_in_place:fail', [jqXHR, textStatus])
+      @$element
+        .html(@oldValue)
+        .removeClass('rip-active')
+        .click(@clickHandler)
+    )
 
   fire : (type, args) ->
     event = $.Event(type)
@@ -125,12 +127,6 @@ class RestInPlaceEditor
     data[param] = token if param && token 
     data
 
-  # A wrapper for jQuery.ajax
-  ajax : (options = {}) ->
-    options.url      = @url
-    options.dataType = "json"
-    $.ajax(options)
-
   # Extract the actual attribute value from the servers response
   extractAttributeFromData : (data) ->
     if @include_root_in_json
@@ -139,13 +135,7 @@ class RestInPlaceEditor
       data[@attributeName]      
   
   # ## Handlers ##############################################################
-  
-  # Handles the successful response from the server
-  loadSuccessCallback : (data) ->
-    @$element.html(@extractAttributeFromData(data))
-    @$element.click(@clickHandler)
-    @$element.removeClass('rip-active')
-  
+
   # Creates a clickhandler for the current instance of RestInPlaceEditor, that
   # has its this pointer permanently bound to the editor instance.
   createClickHandler : ->
