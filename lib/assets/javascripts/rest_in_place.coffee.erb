@@ -35,9 +35,8 @@ class RestInPlaceEditor
     updateRequest = @ajax
       type : "post"
       data : @requestData()
-
-    updateRequest.beforeSend (xhr, settings) =>
-      @fire('rest_in_place:update', [xhr, settings])
+      beforeSend : (xhr, settings) =>
+        @fire('rest_in_place:update', [xhr, settings])
 
     updateRequest.done (data) =>
       if data 
